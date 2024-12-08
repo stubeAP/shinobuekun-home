@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="豊川高校和太鼓部威鳴太鼓生徒が作成した、和太鼓の篠笛運指表作成をサポートするサービスです。" />
+    <meta name="keywords" content="和太鼓,篠笛,運指表,作成,豊川高校,和太鼓部,威鳴太鼓,八本調子,篠笛くん" />
+    <title>篠笛くん</title>
+    <link rel="icon" href="favicon.ico">
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            width: 100%;
+            font-family: "Hiragino Kaku Gothic ProN", "メイリオ", sans-serif;
+        }
+
+        .menu {
+            position: fixed;
+            top: 0;
+            right: 0;
+            padding: 1rem;
+            z-index: 2;
+        }
+
+        .menu-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        .menu-item {
+            font-size: 1.1rem;
+        }
+
+        .menu-item a {
+            color: #333;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 20px;
+            transition: background-color 0.2s;
+        }
+
+        .menu-item a:hover {
+            background-color: rgba(255, 255, 255, 1);
+        }
+
+        .container {
+            width: 100%;
+            height: 100%;
+            background-image: url('./background.jpg');  /* 相対パスで指定 */
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.7);
+        }
+
+        .content {
+            position: relative;
+            text-align: center;
+            z-index: 1;
+        }
+
+        h1 {
+            font-size: clamp(4rem, 10vw, 6rem);
+            margin-bottom: 2rem;
+            color: #333;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .start-button {
+            padding: 1rem 3rem;
+            font-size: 1.5rem;
+            background-color: #ff6b6b;
+            color: white;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: transform 0.2s, background-color 0.2s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .start-button:hover {
+            background-color: #ff5252;
+            transform: scale(1.05);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 3;
+        }
+
+        .modal-content {
+            position: relative;
+            background: white;
+            margin: 5% auto;
+            padding: 2rem;
+            width: 80%;
+            max-width: 800px;
+            max-height: 80vh;
+            overflow-y: auto;
+            border-radius: 10px;
+        }
+
+        .close-button {
+            position: absolute;
+            right: 1rem;
+            top: 1rem;
+            font-size: 1.5rem;
+            cursor: pointer;
+            border: none;
+            background: none;
+        }
+
+        .confirm-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 4;
+        }
+
+        .confirm-content {
+            background: white;
+            margin: 15% auto;
+            padding: 2rem;
+            width: 90%;
+            max-width: 500px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .confirm-buttons {
+            margin-top: 2rem;
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        .confirm-button {
+            padding: 0.5rem 2rem;
+            font-size: 1.1rem;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .confirm-ok {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .confirm-cancel {
+            background-color: #f44336;
+            color: white;
+        }
+
+        .confirm-button:hover {
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+    <nav class="menu">
+        <ul class="menu-list">
+            <li class="menu-item"><a href="#" onclick="openModal('usage')">使い方</a></li>
+            <li class="menu-item"><a href="#" onclick="openModal('terms')">利用規約</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <div class="content">
+            <h1>篠笛くん</h1>
+            <h2>豊川高校　威鳴太鼓</h2>
+            <h3>笛の運指表作成をサポートします。</h3>
+            <a href="#" onclick="showConfirmation(event)" class="start-button">はじめる</a>
+        </div>
+    </div>
+
+    <!-- LocalStorage確認モーダル -->
+    <div id="confirm-modal" class="confirm-modal">
+        <div class="confirm-content">
+            <p>このアプリはLocalStorageを使用しているため、<br>ブラウザ内にアプリデータを保存します。<br>よろしいですか。<a href="#" onclick="closeModal('confirm'); openModal('terms')">詳しくはこちら</a></p>
+            <div class="confirm-buttons">
+                <button onclick="handleConfirm(true)" class="confirm-button confirm-ok">OK</button>
+                <button onclick="handleConfirm(false)" class="confirm-button confirm-cancel">キャンセル</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 使い方モーダル -->
+    <div id="usage-modal" class="modal">
+        <div class="modal-content">
+            <button class="close-button" onclick="closeModal('usage')">×</button>
+            <h2>使い方</h2>
+            <div>
+                <h3>1. はじめに</h3>
+                <p>篠笛くんは、八本調子篠笛の運指表作成をサポートするWebアプリケーションです。</p>
+                
+                <h3>2. 基本的な操作</h3>
+                <p>「はじめる」ボタンをクリックして、アプリケーションを起動します。</p>
+                
+                <h3>使い方</h3>
+                <p>曲名を一番上に入力してください 。</p>
+                <p>次に笛の穴を押すことで選択できます。</p>
+                <p>完成したら一番下の「運指表を保存」を押すことでブラウザ内と端末にPDFでダウンロードされます。</p>
+                <p style="color: red;">※作成した運指表は一時的にブラウザに保存されるものの、ブラウザを変更すると消えてしまう可能性があります。</p>
+                <h3><mark>お問い合わせは豊川高校和太鼓部原田颯真まで</mark></h3>
+            </div>
+        </div>
+    </div>
+
+    <!-- 利用規約モーダル -->
+    <div id="terms-modal" class="modal">
+        <div class="modal-content">
+            <button class="close-button" onclick="closeModal('terms')">×</button>
+            <h2>利用規約</h2>
+            <div>
+                <h3>1. サービスの利用について</h3>
+                <p>本サービスは、あくまで作成をサポートするものです。</p>
+                
+                <h3>2. 免責事項</h3>
+                <p>本サービスの利用によって生じたいかなる損害についても、運営者は責任を負いません。</p>
+                
+                <h3>3. 著作権について</h3>
+                <p>本サービスに含まれるすべてのコンテンツの著作権は運営者に帰属します。</p>
+
+                <h3>4. システムについて</h3>
+                <p>本サービスはLocalStorageを使用しています。そのためブラウザ内にアプリデータを保存します。</p>
+                <p>LocalStorageは運指表が消えないようにブラウザ内に保存する仕組みです。</p>
+                <p>ブラウザを変更する場合は、アプリデータが消える可能性があります。</p>
+                <p>本サービスは、内部にReact、TypeScript、Tailwind CSS、HTML2Canvasを使用しています。</p>
+                <p>ダウンロード部分にはjsPDFを使用しています。</p>
+                <h3><mark>お問い合わせは豊川高校和太鼓部原田颯真まで</mark></h3>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function openModal(type) {
+            document.getElementById(`${type}-modal`).style.display = 'block';
+        }
+
+        function closeModal(type) {
+            document.getElementById(`${type}-modal`).style.display = 'none';
+        }
+
+        function showConfirmation(event) {
+            event.preventDefault();
+            document.getElementById('confirm-modal').style.display = 'block';
+        }
+
+        function handleConfirm(confirmed) {
+            document.getElementById('confirm-modal').style.display = 'none';
+            if (confirmed) {
+                window.location.href = 'https://inari-shinobuekunapp.mpbn.jp';
+            }
+        }
+
+        // モーダル外クリックで閉じる
+        window.onclick = function(event) {
+            if (event.target.className === 'modal') {
+                event.target.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>
